@@ -1,0 +1,42 @@
+import pandas as pd
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# Read the Excel file
+df = pd.read_excel("test.xlsx")
+
+# Set up email parameters
+email_sender = "tech_support@gkciet.ac.in"
+password = "msgi ukdq tldv nnnu"
+subject = "Verify Your Email Address"
+ 
+# Set up SMTP server
+smtp_server = "smtp.gmail.com"
+port = 587
+
+# Log in to the server
+server = smtplib.SMTP(smtp_server, port)
+server.starttls()
+server.login(email_sender, password)
+
+# Iterate through each row in the DataFrame
+for index, row in df.iterrows():
+    recipient_email = row['email']
+    
+    # Create a message
+    msg = MIMEMultipart()
+    msg['From'] = email_sender
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    body = "Dear Applicant,\n\n Please click on the below activation link to verify your email address. \n\n https://career.gkciet.ac.in/Login/confirmEmail/"+row['token']
+        
+    # Attach the body to the email
+    msg.attach(MIMEText(body, 'plain'))
+    
+    # Send the email
+    server.sendmail(email_sender, recipient_email, msg.as_string())
+
+# Quit the server
+server.quit()
